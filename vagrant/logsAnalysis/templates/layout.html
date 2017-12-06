@@ -1,0 +1,170 @@
+<!doctype html>
+<html>
+<head>
+  <title>Logs Analysis</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+          integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+          crossorigin="anonymous"></script>
+  <script src="/static/index.js"></script>
+</head>
+<body>
+<div class="container">
+  <div class="row">
+    <h1>Logs Analysis Project</h1>
+    <h3>Udacity Intro to Programming Nanodegree</h3>
+  </div>
+  <hr>
+  <div class="row">
+    <h2>1. What are the most popular three articles of all time?</h2>
+    <button id="show-answer-1" type="button" class="btn btn-primary">Show Query</button>
+    <pre id="answer-1" class="hidden">
+      SELECT
+        articles.title,
+        count(log.path) AS total
+      FROM
+        articles
+          LEFT JOIN
+        log
+          ON
+        articles.slug = substring(log.path, 10)
+      GROUP BY
+        articles.title
+      ORDER BY
+        total DESC
+    </pre>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Article Title</th>
+          <th>Total Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in answer1 %}
+        <tr>
+          {% for col in row %}
+          <td>{{ col }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <form action="/download/1" method="get" target='_blank'>
+      <button type="submit" class="btn btn-success">Download TXT File</button>
+    </form>
+
+    <hr>
+
+    <h2>2. Who are the most popular article authors of all time?</h2>
+    <button id="show-answer-2" type="button" class="btn btn-primary">Show Query</button>
+    <pre id="answer-2" class="hidden">
+      SELECT
+        authcle.name,
+        COUNT(log.path) AS total
+      FROM
+      (
+        SELECT
+          authors.name AS name,
+          articles.slug AS slug
+        FROM
+          authors
+            LEFT JOIN
+          articles
+            ON
+          authors.id = articles.author
+        GROUP BY
+          authors.name,
+          articles.slug
+      ) AS authcle LEFT
+      JOIN
+        log
+          ON
+        authcle.slug = substring(log.path, 10)
+      GROUP BY
+        authcle.name
+      ORDER BY
+        total DESC
+    </pre>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Author Name</th>
+          <th>Total Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in answer2 %}
+        <tr>
+          {% for col in row %}
+          <td>{{ col }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <form action="/download/2" method="get" target='_blank'>
+      <button type="submit" class="btn btn-success">Download TXT File</button>
+    </form>
+
+    <hr>
+
+    <h2>3. On which days did more than 1% of requests lead to errors?</h2>
+    <button id="show-answer-3" type="button" class="btn btn-primary">Show Query</button>
+    <pre id="answer-3" class="hidden">
+      SELECT
+        errors.date,
+        errors.total
+      FROM
+      (
+        SELECT
+          time::date AS date,
+          COUNT(status) AS total
+        FROM
+          log
+        WHERE
+          log.status = '404 NOT FOUND'
+        GROUP BY
+          date
+        ORDER BY
+          total DESC
+      ) AS errors,
+      (
+        SELECT
+          ROUND(0.01 * COUNT(log)) AS total
+        FROM
+          log
+      ) AS log_count
+      WHERE
+        errors.total > log_count.total
+    </pre>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Log Date</th>
+          <th>Error Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in answer3 %}
+        <tr>
+          {% for col in row %}
+          <td>{{ col }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <form action="/download/3" method="get" target='_blank'>
+      <button type="submit" class="btn btn-success">Download TXT File</button>
+    </form>
+  </div>
+</body>
+</html>
