@@ -4,9 +4,9 @@
 This Logs Analysis project is intended to test my understanding of PostgreSQL and Python programming.
 
 Technology used:
-- Vagrant to isolate development environment
-- Flask framework for the web display
-- PostgreSQL for the database
+- __Vagrant__ to isolate development environment
+- __Flask framework__ for the web display
+- __PostgreSQL__ for the database
 
 ## Setup Project
 ### Enter vagrant environment
